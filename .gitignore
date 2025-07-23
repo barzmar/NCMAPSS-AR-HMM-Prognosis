@@ -1,2 +1,4 @@
-data/
-dataNew/
+data/*
+!data/.gitkeep
+dataNew/*
+!dataNew/.gitkeep
