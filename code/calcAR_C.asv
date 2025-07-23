@@ -1,0 +1,19 @@
+function [AVectors, counter] = calcAR_C(cruiseData,sensor_index,p, Window, Lag)
+%preparing for while loop
+L = length(cruiseData);
+
+
+
+counter = 0;
+
+for f = 1 : L
+    for c = 1 : length(cruiseData(f).flight)
+        for i = 1 : Lag : length(cruiseData(f).flight(c).Value)-Window
+            counter = counter + 1;
+            y = iddata(cruiseData(f).flight(1).Value(sensor_index, i:i+Window)', [], 1);
+            tempModel = ar(y, p, 'ls'); % Assuming AR calculation on the second column
+            AVectors(counter, :) = tempModel.A;
+        end
+    end
+end
+end

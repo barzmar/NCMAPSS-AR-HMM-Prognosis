@@ -1,0 +1,16 @@
+%[text] Downloading and unzipping dataset, into "data" directory:
+dataFolder = "data";
+if ~exist(dataFolder,'dir')
+    mkdir(dataFolder);
+end
+
+filename = matlab.internal.examples.downloadSupportFile("nnet","data/TurbofanEngineDegradationSimulationData.zip");
+unzip(filename,dataFolder);
+
+
+
+%[appendix]{"version":"1.0"}
+%---
+%[metadata:view]
+%   data: {"layout":"onright","rightPanelPercent":14.1}
+%---

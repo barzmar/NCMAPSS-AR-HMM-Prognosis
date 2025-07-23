@@ -1,0 +1,41 @@
+cruise = unitsCruises(1).cruiseData;
+maxOrder = 60;
+indexSensor = 1;
+flightsToExamine = 10;
+
+INDICATORS = ModelOrderSelection(cruise, maxOrder, flightsToExamine, indexSensor);
+
+h1 = figure; 
+h2 = figure; 
+h3 = figure;
+
+x = 1 : 1 : maxOrder;
+
+for c = 1 : length(INDICATORS)
+    
+    figure(h1);
+    hold on;
+    plot(x, INDICATORS(c).OrderIndicator(1, :), 'DisplayName', ['AIC--c' num2str(c)]);
+    xlabel('Model Order');
+    ylabel('AIC');
+    title('AIC vs Model Order');
+    legend;
+    
+    
+    
+    figure(h2);
+    hold on;
+    plot(x, INDICATORS(c).OrderIndicator(2, :), 'DisplayName', ['FPE--c' num2str(c)]);
+    xlabel('Model Order');
+    ylabel('FPE');
+    title('FPE vs Model Order');
+    legend;
+    
+    figure(h3);
+    hold on;
+    plot(x, INDICATORS(c).OrderIndicator(3, :),'DisplayName', ['MDL--c' num2str(c)]);
+    xlabel('Model Order');
+    ylabel('MDL');
+    title('MDL vs Model Order');
+    legend;
+end
