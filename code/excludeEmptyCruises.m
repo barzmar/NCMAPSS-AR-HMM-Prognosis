@@ -25,7 +25,7 @@ for u = 1 : num_units
     i = 1;
     while i <= cruise_index_max
         try 
-            while isempty(cruise(i + IndexNEmpty).flight)
+            while isempty(cruise(i + IndexNEmpty).cruise)
                 IndexNEmpty = IndexNEmpty + 1;
             end
         catch exception

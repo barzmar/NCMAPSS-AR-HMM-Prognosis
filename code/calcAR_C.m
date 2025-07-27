@@ -1,23 +1,35 @@
-function [AVectors, BVectors, counter] = calcAR_C(cruiseData,sensor_index, p, Window, Lag)
+function [AVectors, BVectors, counter] = calcAR_C(signal, p, Window, Lag)
 %preparing for while loop
-L = length(cruiseData);
+% L = length(cruiseData);
 speed_index = 6;
 
-
+L = length(signal.OutputData);
 counter = 0;
 
-for f = 1 : L
-    for c = 1 : length(cruiseData(f).flight)
-        for i = 1 : Lag : length(cruiseData(f).flight(c).Value)-Window
+for i = 1 : Lag : L-Window
             counter = counter + 1;
-            % y = iddata(cruiseData(f).flight(c).Value(sensor_index, i:i+Window)', [], 1);
-            y = cruiseData(f).flight(c).Value(sensor_index, i:i+Window)';
-            u = cruiseData(f).flight(c).Value(speed_index, i:i+Window)';
+            y = signal(i:i+Window);
+            % y = cruiseData(f).flight(c).DValue(sensor_index, i:i+Window)';
+            % u = cruiseData(f).flight(c).DDValue(speed_index, i:i+Window)';
             % tempModel = ar(y, p, 'ls'); % Assuming AR calculation on the second column
-            tempModel = arx(u, y, [p 2 1]); % Assuming AR calculation on the second column
+            tempModel = arx(y, [p p 0]); % Attempt with ARX system
             AVectors(counter, :) = tempModel.A;
             BVectors(counter, :) = tempModel.B;
-        end
-    end
 end
+
+
+% for f = 1 : L
+%     for c = 1 : length(cruiseData(f).flight)
+%         for i = 1 : Lag : length(cruiseData(f).flights(i).cruises(c).DDValue)-Window
+%             counter = counter + 1;
+%             y = iddata(cruiseData(f).flight(c).DDValue(sensor_index, i:i+Window)', [], 1);
+%             % y = cruiseData(f).flight(c).DValue(sensor_index, i:i+Window)';
+%             % u = cruiseData(f).flight(c).DDValue(speed_index, i:i+Window)';
+%             tempModel = ar(y, p, 'ls'); % Assuming AR calculation on the second column
+%             % tempModel = arx(u, y, [5 5 0]); % Attempt with ARX system
+%             AVectors(counter, :) = tempModel.A;
+%             BVectors(counter, :) = tempModel.B;
+%         end
+%     end
+% end
 end
