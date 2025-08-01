@@ -1,13 +1,14 @@
-function [intervals, start_idx_array, fin_idx_array] = extract_maxTimeSeries(time_series, minLength)
+function [intervals, start_idx_array, fin_idx_array] = extract_maxTimeSeries(time_series, minLength, percThreshold)
     arguments
         time_series (1, :)
         minLength (1,1) int16 = 100;
+        percThreshold (1,1) double = 0.005;        
     end
     % Find the maximum value and its index
     [max_value, max_index] = max(time_series);
     
     %Parameter for threhold
-    percThreshold = 0.005;
+
     
 
     % Define the threshold for "around" the max value

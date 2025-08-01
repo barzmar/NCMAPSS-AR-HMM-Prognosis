@@ -1,0 +1,19 @@
+t = 0;
+cellTable = cell.empty;
+
+test = table.empty;
+
+for i = 1 : length(ppCruiseData(unit).flights)
+    for j = 1 : length(ppCruiseData(unit).flights(i).cruises)
+        % signal = iddata(ppCruiseData(unit).flights(i).cruises(c).DDValue(sensor_index, :)', [], 1);
+        output = [ppCruiseData(unit).flights(i).cruises(c).DDValue(sensor_index, :)'];
+        input = [] ;% [ppCruiseData(unit).flights(i).cruises(c).Value(6, :)' ppCruiseData(unit).flights(i).cruises(c).Value(7, :)' ppCruiseData(unit).flights(i).cruises(c).Value(8, :)'];
+        signal = iddata(output, input, 1);
+        
+        t = t +1;
+        
+        [test ]= adftest(signal.OutputData);
+
+        % cellTable{t} = StatTable; % Store the result of the adftest in the cellTable
+    end
+end

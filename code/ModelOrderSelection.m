@@ -1,24 +1,18 @@
-function INDICATORS = ModelOrderSelection(cruise, maxOrder, numberFlightsToExamine, indexSensor)
-    
-    
-    INDICATORS = struct.empty;
-    
-    counter = 0;
-    for f = 1 : numberFlightsToExamine
-    
-        for c = 1 : length(cruise(f).flight)
-            counter = counter + 1;
-    
-            p = iddata(cruise(f).flight(c).Value(indexSensor, :)', [], 1);
-            for i = 1 : maxOrder
-                n = length(cruise(f).flight(c).Value(indexSensor, :)');
-                model_est = ar(p, i, 'ls');
-                AIC(i) = model_est.Report.Fit.AIC;
-                FPE(i) = model_est.Report.Fit.FPE;
-                MDL(i) = n * log(model_est.Report.Fit.LossFcn) + 2*i * log(n);
-            end
-    
-            INDICATORS(counter).OrderIndicator = [AIC; FPE; MDL];
-        end
+function INDICATORS = ModelOrderSelection(signal, maxOrder)
+
+
+
+    for p = 1 : maxOrder
+        n = length(signal.OutputData);
+        dim_y = size(signal.OutputData, 2);
+
+        ny = ones(dim_y, dim_y, "double") .* p;
+        model_est = ar(signal, ny, 'ls');
+        AIC(p) = model_est.Report.Fit.AIC;
+        FPE(p) = model_est.Report.Fit.FPE;
+        MDL(p) = n * log(model_est.Report.Fit.LossFcn) + 2*p * log(n);
+        
     end
+    INDICATORS = [AIC; FPE; MDL];
+            
 end

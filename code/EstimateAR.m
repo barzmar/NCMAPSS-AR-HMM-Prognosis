@@ -1,19 +1,39 @@
-n_w = 30;
+n_w = 50;
 num_cruises = 30;
-num_units = 1;
-healthyCruiseData = struct.empty;
 
-healthyCruiseData = excludeEmptyCruises(unitsCruises, num_units);
+total_counter = 0;
 
 sensor_index = 12; %sensor to use ( from 9 to 22)
-p = 10; %number of parameters (found by analysing FPE, MDL, AIC graph)
+p = 23; %number of parameters (found by analysing FPE, MDL, AIC graph)
+
+
+
+
 
 % : amount of sample per AR estimation Lag: overlap of window
 Window = 400;
 Lag = 20;
+unit = 1;
+input = [];
+output = [];
+AVectors = double.empty;
+BVectors = double.empty;
+for i = 1 : length(ppCruiseData(unit).flights)
+    for c = 1 : length(ppCruiseData(unit).flights(i).cruises)
+        % signal = iddata(ppCruiseData(unit).flights(i).cruises(c).DDValue(sensor_index, :)', [], 1);
+        output = [ppCruiseData(unit).flights(i).cruises(c).Dad(sensor_index, 1:end)'];
+        % mach_filtered = lowpass(ppCruiseData(unit).flights(i).cruises(c).Dad(6, :), 0.05, 1);  % Choose a reasonable cutoff
+        
+        % input = [ppCruiseData(unit).flights(i).cruises(c).Dad(6, :)'];
+        signal = iddata(output, input, 1);
 
-[AVectors, BVectors, counter] = calcAR_C(healthyCruiseData,sensor_index,p, Window, Lag);
-
+        % ESTIMATION
+        [temp_AVectors, temp_BVectors, counter] = calcAR_C(signal, p, Window, Lag);
+    end
+    AVectors = vertcat(AVectors, temp_AVectors);
+    BVectors = vertcat(BVectors, temp_BVectors);
+    total_counter = total_counter + counter;
+end
 % calculate average of the AR coeffiecients calculated
 % the resulting coefiecients is AR model for healthy system.
 
@@ -22,17 +42,19 @@ newAR_model = idpoly(newAR);
 
 figure;
 hold on;
-plot(1:1:counter, AVectors(:,2))
-plot(1:1:counter, AVectors(:,3))
-plot(1:1:counter, AVectors(:,4))
-plot(1:1:counter, AVectors(:,5))
-% plot(1:1:counter, AVectors(:,6))
-% plot(1:1:counter, AVectors(:,7))
-% plot(1:1:counter, AVectors(:,8))
-% plot(1:1:counter, AVectors(:,9))
-% plot(1:1:counter, AVectors(:,10))
-% plot(1:1:counter, AVectors(:,11))
-plot(1:1:counter, BVectors(:,2))
-plot(1:1:counter, BVectors(:,3))
-% plot(1:1:counter, BVectors(:,4))
-% plot(1:1:counter, BVectors(:,5))
+plot(1:1:total_counter, AVectors(:,2))
+plot(1:1:total_counter, AVectors(:,3))
+plot(1:1:total_counter, AVectors(:,4))
+
+for j = 1 :size(BVectors,2)
+    for i = 1:length(BVectors)
+        temp = BVectors{i, j};
+        BVec(j, i,:) = temp;
+    end
+    figure;
+    hold on;
+    plot(1:1:total_counter, BVec(j, :, 2));
+    plot(1:1:total_counter, BVec(j, :, 3));
+    plot(1:1:total_counter, BVec(j, :, 4));
+end
+
