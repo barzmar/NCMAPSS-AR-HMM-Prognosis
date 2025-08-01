@@ -6,7 +6,7 @@ NCMAPSS AR-HMM Prognosis project for masters Thesis in Automation Engineering.
 Project consists of:
 
 1. ~~Data download~~ 
-2. ~~Data selection ~~ 
+2. ~~Data selection~~ 
 3. Data pre-processing 
 4. AR/ARIMAX estimation/~~Model Order Selection~~ 
 5. Calculate scalar feature for estimating RUL (~~Itakuro Saito~~ )
