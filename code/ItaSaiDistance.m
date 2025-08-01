@@ -1,4 +1,4 @@
-n_w = 30;
+n_w = 100;
 PSDhat = calcPSD(newAR);
 figure;
 hold on;

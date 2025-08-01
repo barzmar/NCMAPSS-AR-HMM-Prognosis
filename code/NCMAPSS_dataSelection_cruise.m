@@ -1,5 +1,6 @@
+%% 
 clear;
-close;
+% close;
 
 
 %Load data from file
@@ -44,7 +45,7 @@ for u = 1 : length(units)
 
     for i = 1 : numberFlights
         y = unitsFlights(u).flights(i).Value(5, :);
-        temp_intervals = findCruiseIntervals(y, 15, 1.00, 500);
+        temp_intervals = findCruiseIntervals(y, 15, 1.0, 415);
         for j= 1:size(temp_intervals,1)
         unitsCruises(u).flights(i).cruises(j).Value = unitsFlights(u).flights(i).Value( : , temp_intervals(j,1) : temp_intervals(j,2));
         unitsCruises(u).flights(i).cruises(j).Name = unitsFlights(u).flights(i).Name;

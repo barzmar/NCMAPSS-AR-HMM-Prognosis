@@ -1,20 +1,28 @@
-function [AVectors, BVectors, counter] = calcAR_C(signals,sensor_index, p, Window, Lag)
+function [AVectors, BVectors, counter] = calcAR_C(signal, p, Window, Lag)
 %preparing for while loop
 % L = length(cruiseData);
 speed_index = 6;
 
+L = length(signal.OutputData);
+counter = 0
 
-counter = 0;
+dim_y = size(signal.OutputData, 2);
+dim_u = size(signal.InputData, 2)
 
-for i = 1 : Lag : length(cruiseData(f).flights(i).cruises(c).DDValue)-Window
-%             counter = counter + 1;
-%             y = iddata(cruiseData(f).flight(c).DDValue(sensor_index, i:i+Window)', [], 1);
-%             % y = cruiseData(f).flight(c).DValue(sensor_index, i:i+Window)';
-%             % u = cruiseData(f).flight(c).DDValue(speed_index, i:i+Window)';
-%             tempModel = ar(y, p, 'ls'); % Assuming AR calculation on the second column
-%             % tempModel = arx(u, y, [5 5 0]); % Attempt with ARX system
-%             AVectors(counter, :) = tempModel.A;
-%             BVectors(counter, :) = tempModel.B;
+ny = ones(dim_y, dim_y, "int16") .* p;
+n = ones(dim_y, dim_u, "int16") .* p;
+
+for i = 1 : Lag : L-Window
+            counter = counter + 1;
+            y = signal(i:i+Window);
+            % y = cruiseData(f).flight(c).DValue(sensor_index, i:i+Window)';
+            % u = cruiseData(f).flight(c).DDValue(speed_index, i:i+Window)';
+            % tempModel = ar(y, p, 'ls'); % Assuming AR calculation on the second column
+
+            
+            tempModel = arx(y, [ny nu 1]); % Attempt with ARX system
+            AVectors(counter, :) = tempModel.A;
+            BVectors(counter, :) = tempModel.B;
 end
 
 

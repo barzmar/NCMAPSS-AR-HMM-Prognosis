@@ -6,15 +6,26 @@ speed_index = 6;
 L = length(signal.OutputData);
 counter = 0;
 
+dim_y = size(signal.OutputData, 2);
+dim_u = size(signal.InputData, 2);
+phase = 2;
+
+ny = ones(dim_y, dim_y, "double") .* p;
+nu = ones(dim_y, dim_u, "double") .* (p-phase);
+nk = ones(dim_y, dim_u, "double") * phase;
+
 for i = 1 : Lag : L-Window
             counter = counter + 1;
             y = signal(i:i+Window);
             % y = cruiseData(f).flight(c).DValue(sensor_index, i:i+Window)';
             % u = cruiseData(f).flight(c).DDValue(speed_index, i:i+Window)';
-            % tempModel = ar(y, p, 'ls'); % Assuming AR calculation on the second column
-            tempModel = arx(y, [p p 0]); % Attempt with ARX system
-            AVectors(counter, :) = tempModel.A;
-            BVectors(counter, :) = tempModel.B;
+            % tempModel = ar(y, p, 'ls') % Assuming AR calculation on the second column
+
+            
+            tempModel = arx(y, ny) % Attempt with ARX system
+            % tempModel = armax(y, [p 3])
+            AVectors(counter, :, :) = tempModel.A;
+            BVectors(counter, :, :) = tempModel.B;
 end
 
 
