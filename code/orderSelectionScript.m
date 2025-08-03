@@ -7,28 +7,33 @@ max_order = 50;
 
 counter = 0;
 modelOrder = {};
-for i = 1 : 10
+for i = 1 : 3
     for c = 1 : length(ppCruiseData(unit).flights(i).cruises)
         output = [];
         input = [];
-        output = [ppCruiseData(unit).flights(i).cruises(c).Dad(sensor_index, 2:end)'];
+        output = [ppCruiseData(unit).flights(i).cruises(c).Dad(sensor_index, 2:end)', ppCruiseData(unit).flights(i).cruises(c).Dad(22, 2:end)'];
         % input = [ppCruiseData(unit).flights(i).cruises(c).Dad(6, :)'];
         signal = iddata(output, input, 1);
         INDICATORS_temp = ModelOrderSelection(signal, max_order);
 
         % Store the selected model order for each cruise
-        counter = counter +1;
-        modelOrder{counter} = INDICATORS_temp;
+        if isempty(modelOrder)
+            modelOrder = INDICATORS_temp;
+        else
+            for l = 1:3
+                modelOrder{1,l} = horzcat(modelOrder{1,l}, INDICATORS_temp{1,l}); % Append the selected model order
+            end
+        end
     end
 end
 
 %plot each value
-for i = 1 : size(modelOrder{1,1},1)
+for i = 1 : size(modelOrder,2)
     fig(i) = figure(i);
     hold on;
-    for j = 1 : length(modelOrder)
-        modelOrderMat = cell2mat(modelOrder(j));
-        plot(1:1:max_order, modelOrderMat(i,:));
+    for j = 1 : size(modelOrder{1,1}, 2)
+        plot(1:1:max_order, modelOrder{1,i}(:, j));
+
     end
 
 end
