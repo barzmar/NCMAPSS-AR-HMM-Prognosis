@@ -28,17 +28,18 @@ for i = 1 : length(ppCruiseData(unit).flights)
         signal = iddata(output, input, 1);
 
         % ESTIMATION
-        [temp_AVectors, temp_BVectors, counter] = calcAR_C(signal, p, Window, Lag);
+        [~, temp_AVectors, temp_BVectors] = calcAR_C(signal, p, Window, Lag);
     end
     AVectors = vertcat(AVectors, temp_AVectors);
     BVectors = vertcat(BVectors, temp_BVectors);
-    total_counter = total_counter + counter;
 end
 % calculate average of the AR coeffiecients calculated
 % the resulting coefiecients is AR model for healthy system.
 
 newAR = sum(AVectors(1:n_w,:),1)/n_w;
 newAR_model = idpoly(newAR);
+
+total_counter = length(AVectors);
 
 figure;
 hold on;
