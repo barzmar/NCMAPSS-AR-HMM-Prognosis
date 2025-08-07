@@ -1,5 +1,9 @@
-function INDICATORS = ModelOrderSelection(signal, maxOrder)
-
+function INDICATORS = ModelOrderSelection(signal, maxOrder, IntegrateNoise)
+arguments
+signal
+maxOrder
+IntegrateNoise = false
+end
 
     for p = 1 : maxOrder
         % length of signal window
@@ -10,7 +14,7 @@ function INDICATORS = ModelOrderSelection(signal, maxOrder)
         % model_est = ar(signal, ny, 'ls');
 
         INDICATORS = cell(1);
-        [Models, ~, ~] = calcAR_C(signal, p, n, 100);
+        [Models, ~, ~] = calcAR_C(signal, p, n, 100, IntegrateNoise);
         for j = 1 : length(Models)
             model_est = Models{j};
 

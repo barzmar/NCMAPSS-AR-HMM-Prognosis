@@ -11,10 +11,10 @@ for i = 1 : 3
     for c = 1 : length(ppCruiseData(unit).flights(i).cruises)
         output = [];
         input = [];
-        output = [ppCruiseData(unit).flights(i).cruises(c).Dad(sensor_index, 2:end)', ppCruiseData(unit).flights(i).cruises(c).Dad(22, 2:end)'];
-        % input = [ppCruiseData(unit).flights(i).cruises(c).Dad(6, :)'];
+        output = [ppCruiseData(unit).flights(i).cruises(c).Dad(sensor_index, 1:end)'];
+        input = [ppCruiseData(unit).flights(i).cruises(c).Dad(7, :)'];
         signal = iddata(output, input, 1);
-        INDICATORS_temp = ModelOrderSelection(signal, max_order);
+        INDICATORS_temp = ModelOrderSelection(signal, max_order, [false]);
 
         % Store the selected model order for each cruise
         if isempty(modelOrder)

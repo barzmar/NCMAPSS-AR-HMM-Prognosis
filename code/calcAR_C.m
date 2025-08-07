@@ -1,5 +1,13 @@
-function [Models, AVectors, BVectors] = calcAR_C(signal, p, Window, Lag)
-    %preparing for while loop
+function [Models, AVectors, BVectors] = calcAR_C(signal, p, Window, Lag, IntegrateNoise, phase)
+arguments
+    signal iddata
+    p uint32
+    Window uint32
+    Lag uint32
+    IntegrateNoise logical = false
+    phase uint32 = 0
+end
+    %preparing for while loopa
     % L = length(cruiseData);
     speed_index = 6;
     
@@ -8,10 +16,12 @@ function [Models, AVectors, BVectors] = calcAR_C(signal, p, Window, Lag)
     
     dim_y = size(signal.OutputData, 2);
     dim_u = size(signal.InputData, 2);
-    phase = 2;
     
+    p = double(p);
+    phase = double(phase);
+
     ny = ones(dim_y, dim_y, "double") .* p;
-    nu = ones(dim_y, dim_u, "double") .* (p-phase);
+    nu = ones(dim_y, dim_u, "double") .* p;
     nk = ones(dim_y, dim_u, "double") * phase;
     
     for i = 1 : Lag : L-Window
@@ -21,8 +31,11 @@ function [Models, AVectors, BVectors] = calcAR_C(signal, p, Window, Lag)
                 % u = cruiseData(f).flight(c).DDValue(speed_index, i:i+Window)';
                 % tempModel = ar(y, p, 'ls') % Assuming AR calculation on the second column
     
-                
-                tempModel = arx(y, ny) % Attempt with ARX system
+                if isempty(y.InputData)
+                    tempModel = arx(y, ny, 'IntegrateNoise', IntegrateNoise) % Attempt with ARX system
+                else
+                    tempModel = arx(y, [ny nu nk], 'IntegrateNoise', IntegrateNoise)
+                end
                 % tempModel = armax(y, [p 3])
                 AVectors(counter, :, :) = tempModel.A;
                 BVectors(counter, :, :) = tempModel.B;

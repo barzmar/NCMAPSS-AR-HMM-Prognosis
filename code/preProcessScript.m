@@ -1,4 +1,4 @@
-function ppCruiseData = preProcessScript(unitsCruises)
+function ppCruiseData = preProcessFunction(unitsCruises)
     ppCruiseData = struct.empty;
     
     for i = 1 : length(unitsCruises)
@@ -17,3 +17,5 @@ function ppCruiseData = preProcessScript(unitsCruises)
         end
     end
 end
+
+ppCruiseData = preProcessFunction(unitsCruises);
