@@ -1,0 +1,7 @@
+Equation selection using subset regression: regsubsets
+
+Regression gives a linear equation relating measurements to results. In
+ many cases there is more than one possible equation. Looking at all
+ subsets to a limited depth provides a way of finding multiple solutions.
+ See regtest.html
+

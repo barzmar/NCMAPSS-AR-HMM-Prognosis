@@ -1,0 +1,55 @@
+function [final_prob, final_state, best_path] = myViterbi(A, B, start_prob, HI)
+    N = length(A);        % number of states
+    T = length(HI);  % length of observation sequence
+    
+    % Initialize matrices
+    delta   = zeros(N, T);      % highest probability of any path reaching state i at time t
+    psi     = zeros(N, T);      % store the state index that gave max probability
+    p       = zeros(N, T);       % probability of being in state i 
+    
+    last_MOG = N-1;
+    % --- Initialization (t = 1)
+    [~, ~, p(1:last_MOG,1)] = cluster(B, HI(1,:));
+    for i = 1:N
+        if i == N
+            p(i,1) = 0;
+        end
+        delta(i,1) = start_prob(i) * p(i,1);
+        psi(i,1) = 0;
+    end
+    delta(:, 1) = delta(:,1)./sum(delta(:,1));
+
+
+    % --- Recursion (t = 2 to T)
+    for t = 2:T
+        [~, ~, p(1:last_MOG,t)] = cluster(B, HI(t,:));
+        for i = 1:N
+            [max_val, max_state] = max(delta(:,t-1) .* A(:,i));
+            if i == N
+                p(i,t) = 0;
+            end
+            delta(i,t) = max_val * p(i, t);
+            psi(i,t) = max_state;
+        end
+        delta(:, t) = delta(:,t)./sum(delta(:,t));
+    end
+    
+    % --- Termination
+    final_prob = delta(:,T);
+    [~, final_state] = max(delta(:,T));
+    
+        
+    % --- Backtracking
+    best_path = zeros(1,T);
+    best_path(T) = final_state;
+    
+    for t = T-1:-1:1
+        best_path(t) = psi(best_path(t+1), t+1);
+    end
+    
+    % % Display results
+    % fprintf('Most likely state sequence:\n');
+    % disp(states(best_path));
+    % 
+    % fprintf('Final probability of sequence: %.4f\n', final_prob);
+end

@@ -1,0 +1,60 @@
+function Xstd = standardizeTimeSeries(X, hardcoded)
+arguments
+    X 
+    hardcoded int8 = 0
+end
+%STANDARDIZETIMESERIES Standardizes rows of a matrix independently
+%   Xstd = STANDARDIZETIMESERIES(X) takes a matrix X where each row 
+%   represents a separate time series, and returns Xstd where each row 
+%   has been standardized to have mean 0 and standard deviation 1.
+%
+%   Example:
+%       X = [1 2 3 4; 10 20 30 40];
+%       Xstd = standardizeTimeSeries(X)
+
+
+
+        rowMean = [12.02306732; 1; 2.907694534; 1; 2.24E+04; 0.634599044; 68.74469269; ...
+            4.74E+02; 5.58E+02; 1.32E+03; 1.63E+03; 1.10E+03; 10.68097647; ...
+            8.132153422; 10.84363094; 13.41902578; 2.06E+02; 2.09E+02; ...
+            7.874391012; 2.02E+03; 8.20E+03; 2.207492116];
+        rowStd = [0, 0, 0, 0, 4701.688250097566, 0.060689353222026, 13.721654222386393, ...
+            12.362869089820499, 15.741627302563963, 53.7595955652707, 97.24447608052149, ...
+            48.140037823941043, 1.710565118284918, 1.360831826436492, 1.736614333284181, ...
+            2.168649730543456, 40.37383989429601, 40.89697706376928, 1.515848111201703, ...
+            136.1870198917073, 178.5219441833075, 0.545502840417863]';
+7.633666307156473
+0
+0.419635339442432
+0
+6.341906006224644e+03
+0.072681802264852
+13.467383430800217
+16.867090383239962
+17.666061106103093
+52.581408659357514
+91.259192191325425
+49.998206088150269
+2.214111434990475
+1.817812809047022
+2.247828868010634
+2.687483315621644
+44.067101854785875
+44.750260430171501
+1.954536272983179
+1.273997175631856e+02
+1.741681832602208e+02
+0.557758648322011
+    else
+        % Compute row-wise mean and std
+        rowMean = mean(X, 2);         % column vector of row means
+        rowStd  = std(X, 0, 2);       % column vector of row std deviations
+        
+      
+    end
+    % Handle case where std = 0 (constant row -> return zeros)
+    rowStd(rowStd == 0) = 1;
+    % Standardize: subtract mean and divide by std
+    Xstd = (X - rowMean) ./ rowStd;
+    
+end

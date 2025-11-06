@@ -4,12 +4,16 @@ clear;
 
 
 %Load data from file
-filename = "C:\Users\speci\OneDrive\Documents\MATLAB\Thesis\NCMAPSS-AR-HMM-Prognosis\dataNew\data_set\N-CMAPSS_DS07.h5";
-file = load_NCMAPSS_struct(filename);
+filename = "N-CMAPSS_DS02-006"; % file estension is concatenated later
+full_filename = strcat("C:\Users\speci\OneDrive\Documents\MATLAB\Thesis\NCMAPSS-AR-HMM-Prognosis\dataNew\data_set\", filename, ".h5");
+file = load_NCMAPSS_struct(full_filename);
+
 %reduce cumbersome structure from file into a vector of stucts
 data = file.Datasets;
 
 units = extractData_TableRow(data, [1,3,4]);
+
+clear data
 
 unitsFlights = struct.empty(length(units), 0);
 for u = 1 : length(units)
@@ -41,16 +45,48 @@ for u = 1 : length(units)
     % 
     % end
     % unitsCruises(u).flights = cruiseDATA;
-
+for unit = 1 : length(unitsFlights)
+    for f = 1 : length(unitsFlights(unit).flights)
+        [r, c] = size(unitsFlights(unit).flights(f).Value(:,:));
+        unitsFlights(unit).flights(f).StdValue = zeros([r,c]);
+        unitsFlights(unit).flights(f).StdValue(:,:) =  standardizeTimeSeries(unitsFlights(unit).flights(f).Value(:,:), 1);
+    end
+end
 
     for i = 1 : numberFlights
         y = unitsFlights(u).flights(i).Value(5, :);
-        temp_intervals = findCruiseIntervals(y, 15, 1.0, 415);
+        temp_intervals = findCruiseIntervals(y, 15, 1.0, 815);
         for j= 1:size(temp_intervals,1)
         unitsCruises(u).flights(i).cruises(j).Value = unitsFlights(u).flights(i).Value( : , temp_intervals(j,1) : temp_intervals(j,2));
+        unitsCruises(u).flights(i).cruises(j).StdValue = unitsFlights(u).flights(i).StdValue( : , temp_intervals(j,1) : temp_intervals(j,2));
         unitsCruises(u).flights(i).cruises(j).Name = unitsFlights(u).flights(i).Name;
         end
     end
 end
 
-clear file filename numberFlights tempFin tempStart cruiseTimeSeries tempCruise;
+
+
+
+%save flights
+outputDirFlights = "..\dataNew\processed_data_sets\unitsFlight";
+if ~exist(outputDirFlights, 'dir')
+    mkdir(outputDirFlights);
+end
+
+save(strcat(outputDirFlights, "\unitsFlights-file" ,filename), "unitsFlights", "-v7.3");
+
+%save cruises
+outputDirCruises = "..\dataNew\processed_data_sets\unitsCruises";
+if ~exist(outputDirCruises, 'dir')
+    mkdir(outputDirCruises);
+end
+
+save(strcat(outputDirCruises, "\unitsCruises-file", filename), "unitsCruises", "-v7.3");
+
+clear file full_filename numberFlights tempFin tempStart cruiseTimeSeries tempCruise;
+
+%pre-processing data and inserting it into ppCruiseData in the workspace
+preProcessScript;
+
+clear flightsUnit unitsCruises y 
+clear units

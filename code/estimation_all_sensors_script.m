@@ -5,7 +5,7 @@ num_cruises = 30;
 
 total_counter = 0;
 
-p = 3; %number of parameters (found by analysing FPE, MDL, AIC graph)
+p = 5; %number of parameters (found by analysing FPE, MDL, AIC graph)
 
 
 
@@ -22,10 +22,10 @@ BVectors = double.empty;
 for i = 1 : length(ppCruiseData(unit).flights)
     for c = 1 : length(ppCruiseData(unit).flights(i).cruises)
         % signal = iddata(ppCruiseData(unit).flights(i).cruises(c).DDValue(sensor_index, :)', [], 1);
-        output = [ppCruiseData(unit).flights(i).cruises(c).Dad(sensor_index, 1:end)'];
+        output = [ppCruiseData(unit).flights(i).cruises(c).Value(sensor_index, 1:end)'];
         % mach_filtered = lowpass(ppCruiseData(unit).flights(i).cruises(c).Dad(6, :), 0.05, 1);  % Choose a reasonable cutoff
         
-        input = [ppCruiseData(unit).flights(i).cruises(c).Dad(7, :)'];
+        % input = [ppCruiseData(unit).flights(i).cruises(c).Dad(7, :)'];
         signal = iddata(output, input, 1);
 
         % ESTIMATION
@@ -49,7 +49,7 @@ plot(1:1:total_counter, AVectors(:,3))
 plot(1:1:total_counter, AVectors(:,4))
 
 % Create folder name based on current date and sensor index
-folderName = fullfile('..', 'figures', sprintf('Estimation%d%d%d_parameters%d_OutDadInDad', ...
+folderName = fullfile('..', 'figures', sprintf('Estimation%d%d%d_parameters%d_OutValueInNone', ...
     day(datetime('now')), month(datetime('now')), year(datetime('now')), p));
 if ~exist(folderName, 'dir')
     mkdir(folderName);
@@ -76,6 +76,6 @@ close(gcf);
 end
 
 
-for in = 9:22
+for in = 15:22
     EstimateAR_p10(ppCruiseData, in);
 end

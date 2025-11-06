@@ -1,26 +1,30 @@
-function INDICATORS = ModelOrderSelection(signal, maxOrder, IntegrateNoise)
+function INDICATORS = ModelOrderSelection(signal, maxOrder, IntegrateNoise, step, phase)
 arguments
 signal
 maxOrder
 IntegrateNoise = false
+stepW
+phase = 0
 end
 
-    for p = 1 : maxOrder
+    for p = 0 : maxOrder
         % length of signal window
-        n = 400;
+        n = 800;
         % dim_y = size(signal.OutputData, 2);
         % 
         % ny = ones(dim_y, dim_y, "double") .* p;
         % model_est = ar(signal, ny, 'ls');
 
+
         INDICATORS = cell(1);
-        [Models, ~, ~] = calcAR_C(signal, p, n, 100, IntegrateNoise);
+        [Models, ~, ~] = calcAR_C(signal, [p 0], n, step, IntegrateNoise, phase);
         for j = 1 : length(Models)
             model_est = Models{j};
+            n_p = length(model_est.Report.Parameters.Free);
 
-            AIC(p, j) = model_est.Report.Fit.AIC;
-            FPE(p, j) = model_est.Report.Fit.FPE;
-            MDL(p, j) = n * log(model_est.Report.Fit.LossFcn) + 2*p * log(n);
+            AIC(p+1, j) = model_est.Report.Fit.AIC;
+            FPE(p+1, j) = model_est.Report.Fit.FPE;
+            MDL(p+1, j) = n * log(model_est.Report.Fit.LossFcn) + 2*n_p * log(n);
 
             INDICATORS = {AIC, FPE, MDL};
         end

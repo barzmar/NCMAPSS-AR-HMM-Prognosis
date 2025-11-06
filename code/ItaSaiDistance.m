@@ -1,5 +1,5 @@
 n_w = 100;
-PSDhat = calcPSD(newAR);
+PSDhat = PSDmodel(1, newAR, );
 figure;
 hold on;
 plot(PSDhat);
@@ -14,7 +14,7 @@ end
 
 figure;
 plot(ItaSaiVector);
-% 
+
 % for i = n_w+1 : length(AVectors)
 %     tempAVector = sum(AVectors(i-n_w:i-1, :), 1)/n_w;
 % 

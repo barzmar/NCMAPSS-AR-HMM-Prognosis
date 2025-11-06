@@ -1,0 +1,11 @@
+A(1, :) = AVectors(50,1,:);
+B(1, :) = BVectors(50,1,:);
+model = idpoly(A, BVectors, 1, 1, 1);
+
+in = [ppCruiseData(1).flights(56).cruises(1).Dad(7, :)' ppCruiseData(1).flights(56).cruises(1).Dad(6, :)'];
+out = ppCruiseData(1).flights(56).cruises(1).Dad(20, :)';
+
+signal = iddata(out, in, 1);
+
+figure;
+compare(signal, model);

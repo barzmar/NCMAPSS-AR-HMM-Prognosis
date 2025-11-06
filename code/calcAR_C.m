@@ -1,11 +1,12 @@
-function [Models, AVectors, BVectors] = calcAR_C(signal, p, Window, Lag, IntegrateNoise, phase)
+function [Models, AVectors, BVectors] = calcAR_C(signal, p, Window, Lag, IntegrateNoise, phase, regul)
 arguments
     signal iddata
-    p uint32
+    p
     Window uint32
     Lag uint32
     IntegrateNoise logical = false
     phase uint32 = 0
+    regul = 0
 end
     %preparing for while loopa
     % L = length(cruiseData);
@@ -19,27 +20,53 @@ end
     
     p = double(p);
     phase = double(phase);
-
-    ny = ones(dim_y, dim_y, "double") .* p;
-    nu = ones(dim_y, dim_u, "double") .* p;
+    if length(p)>1
+        p1 = p(1);
+        p2 = p(2);
+    else 
+        p1 = p;
+        p2 = p;
+    end
+    ny = ones(dim_y, dim_y, "double") .* p1;
+    nu = ones(dim_y, dim_u, "double") .* (p2);
     nk = ones(dim_y, dim_u, "double") * phase;
     
-    for i = 1 : Lag : L-Window
-                counter = counter + 1;
-                y = signal(i:i+Window);
-                % y = cruiseData(f).flight(c).DValue(sensor_index, i:i+Window)';
-                % u = cruiseData(f).flight(c).DDValue(speed_index, i:i+Window)';
-                % tempModel = ar(y, p, 'ls') % Assuming AR calculation on the second column
-    
-                if isempty(y.InputData)
-                    tempModel = arx(y, ny, 'IntegrateNoise', IntegrateNoise) % Attempt with ARX system
-                else
-                    tempModel = arx(y, [ny nu nk], 'IntegrateNoise', IntegrateNoise)
-                end
-                % tempModel = armax(y, [p 3])
-                AVectors(counter, :, :) = tempModel.A;
-                BVectors(counter, :, :) = tempModel.B;
-                Models{counter} = tempModel;
+    if isnumeric(regul)
+        aopt = arxOptions;
+    else
+        aopt = regul;
+    end
+    if Window == 0
+        
+     y = signal(i:i+Window);
+          
+        if isempty(y.InputData)
+            tempModel = arx(y, ny, 'IntegrateNoise', IntegrateNoise, aopt) % Attempt with ARX system
+        else
+            tempModel = arx(y, [ny nu nk], 'IntegrateNoise', IntegrateNoise, aopt)
+        end
+        % tempModel = armax(y, [p 3])
+        AVectors(counter, :, :) = tempModel.A;
+        BVectors(counter, :, :) = tempModel.B;
+        Models{counter} = tempModel;
+        
+    else
+
+        for i = 1 : Lag : L-Window
+                    counter = counter + 1;
+                    y = signal(i:i+Window);
+                    % signal contains both input and output data
+        
+                    if isempty(y.InputData)
+                        tempModel = arx(y, ny, 'IntegrateNoise', IntegrateNoise, aopt) % Attempt with ARX system
+                    else
+                        tempModel = arx(y, [ny nu nk], 'IntegrateNoise', IntegrateNoise, aopt)
+                    end
+                    % tempModel = armax(y, [p 3])
+                    AVectors(counter, :, :) = tempModel.A;
+                    BVectors(counter, :, :) = tempModel.B;
+                    Models{counter} = tempModel;
+        end
     end
 
 

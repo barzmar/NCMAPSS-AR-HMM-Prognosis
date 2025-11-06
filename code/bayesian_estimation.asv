@@ -1,0 +1,50 @@
+p = 3;
+PriorMdl = bayeslm(p,'ModelType', 'Diffuse' , 'Intercept', false ,'VarNames', [ppCruiseData(1).flights(1).cruises(1).Name(5:7,1)]);
+
+X=[];
+X_1=[];
+y = [];
+y_1 = [];
+
+for i = 1 : 20
+    X = [X unitsFlights(1).flights(i).Value(5:7, 1:end-1)];
+    X_1 = [X_1 unitsFlights(1).flights(i).Value(5:7,2:end)];
+    y = [y unitsFlights(1).flights(i).Value(19,1:end-1)];
+    y_1 = [y_1 unitsFlights(1).flights(i).Value(19,2:end)];
+end
+
+
+X_train = [X_1(:,:)];
+X_train = standardizeTimeSeries(X_train)';
+
+y_train = standardizeTimeSeries(y_1)';
+
+
+PosteriorMdl = estimate(PriorMdl,X_train,y_train);
+
+
+Mdl = fitlm(X_train,y_train);
+X_val = [];
+X_1_val = [];
+y_val = [];
+y_1_val = [];
+
+for i = 4 : 4
+    X_val = [X_val unitsFlights(2).flights(i).Value(5:7, 1:end-1)];
+    X_1_val = [X_1_val unitsFlights(2).flights(i).Value(5:7,2:end)];
+    y_val = [y_val unitsFlights(2).flights(i).Value(19,1:end-1)];
+    y_1_val = [y_1_val unitsFlights(2).flights(i).Value(19,2:end)];
+end
+
+
+X_val_test = [X_1_val(:,:)];
+X_val_test = X_val_test';
+
+yF = forecast(PosteriorMdl,X_val_test);
+
+figure;
+plot(y_1_val);
+hold on;
+plot(yF);
+
+frmse = sqrt(mean((y_val - yF').^2, 2))

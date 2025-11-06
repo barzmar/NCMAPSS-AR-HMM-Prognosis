@@ -1,0 +1,19 @@
+function [Sf,freq] = PSDmodel(num,den,var,Nf,fs)
+% [Sf,freq] = PSDmodel(num,den,var,Nf,fs) computes the Power Spectral Density (PSD) 
+% of the AutoRegressive (AR) model described by the numerator coefficients (num), 
+% denominator coefficients (den), and variance (var). 
+% Nf is the number of frequency points to compute, and fs is the sampling frequency.
+%
+% The function uses the freqz function to calculate the frequency response of the 
+% digital filter defined by the given numerator and denominator coefficients. 
+% It then computes the magnitude of the frequency response and scales it by the 
+% variance to obtain the PSD. The output Sf represents the computed PSD values, 
+% while freq contains the corresponding frequency points.
+
+[H, omega] = freqz(num, den, Nf, fs);
+H = abs(H);
+Sf = var * H.^2;
+freq = omega;
+
+end
+

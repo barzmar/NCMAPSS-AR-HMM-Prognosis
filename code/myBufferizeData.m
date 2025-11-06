@@ -1,0 +1,6 @@
+function [buffered_data] = myBufferizeData(data,sensorIndexes, window, step, phase)
+
+buffered_data = custom_buffer( ...
+    data(sensorIndexes, :), ...
+    length(data)-phase, step, phase); 
+end

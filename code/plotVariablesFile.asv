@@ -1,0 +1,64 @@
+dirpath = "..\figures\ItaSaiDistances1Inputs\Variables\";
+
+
+clear data;
+files = dir(dirpath);
+titles = string();
+index = 1;
+
+
+for i = 3 : length(files)
+    temp = load(strcat(dirpath, files(i).name));
+    data(index, 1) = temp;
+    titles(index) = files(i).name;
+    index = index +1;
+end
+
+% for i = 1 : 10
+%     figure;
+%     hold on;
+%     for j = 1 : 3
+%         plot(data(i).AVectors(:,1,j));
+%     end
+%     title(titles(i));
+% end
+
+for i = 1 : 17
+    figure;
+    hold on;
+    plot(data(i).ItaSaiDist(:));
+    title(titles(i));
+end
+
+
+% for i = 35 : 42
+% 
+%     for k = 1 : 2
+%         figure;
+%         hold on;
+% 
+%         for j = 1 : 2
+%             Bmat = cell2mat(data(i).BVectors);
+%             plot(Bmat(:,j, k));
+% 
+%         end
+%         title(titles(i));
+%         ylabel(k);
+%     end
+% end 
+
+
+n_w = 10
+
+newA = sum(AVectors(1:n_w,:),1)/n_w;
+
+newB = sum(BVectors(1:n_w,:),1)/n_w;
+total_counter = length(AVectors);
+    
+psdHat = PSDmodel(1, newA, 1, 1024, 1);
+ItaSaiDist = [];
+for i = 1 : total_counter
+    psdTemp = PSDmodel(1, AVectors(i,:), 1, 1024, 1);
+    ItaSaiDist(i) = SpectralDistance(psdHat, psdTemp);
+    
+end

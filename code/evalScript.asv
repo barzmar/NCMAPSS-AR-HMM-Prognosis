@@ -1,0 +1,102 @@
+% clear
+% 
+% load("..\dataNew\processed_data_sets\unitsFlight\unitsFlights-fileN-CMAPSS_DS02-006.mat","-mat");
+% load("..\dataNew\MDLmodel\DATASET__PLACEHOLDER\MDLmodel11  12_00.mat")
+
+% data = unitsFlights;
+
+clear unitsFlights
+
+phase = 2;
+window = 900;
+step = 250;
+targets = [11 12];
+
+total_frmse = cell.empty;
+numHI = 0; % number of health indexes
+
+plotNotSave = true;
+
+for targetSensor = targets
+    numHI = numHI + 1;
+    sensors = [5,6,7,8, targetSensor];
+
+    for unit2 = 1 : 9
+        frmse{unit2} = []; % Initialize frmse for the current unit
+        for f2 = 1 : length(data(unit2).flights)
+            buffered_data = custom_buffer( ...
+                data(unit2).flights(f2).StdValue(sensors, :), ...
+                window, step, phase);
+        
+            L_Buff = length(buffered_data);
+            temp_frmse = zeros(L_Buff,1);
+            
+            for i = 1 : L_Buff
+                temp_frmse = [];
+                temp_data = buffered_data{i};
+                X = temp_data(1:end-1-phase,:)';
+                y = temp_data(end,:)';
+                clear temp_data    
+            
+                yF = my_eval(models{numHI}, X, bestPredictorsInd{numHI});
+                            
+                temp_frmse(i) = sqrt(mean((y - yF).^2, 1));
+                
+            end
+
+            if isempty(frmse{unit2})
+                frmse{unit2} = temp_frmse;
+            else
+                frmse{unit2} = horzcat(frmse{unit2}, temp_frmse);
+            end
+        end
+    end
+    
+    if isempty(total_frmse)
+        total_frmse = cell(length(frmse), length(targets));
+        total_movMfrmse = cell(length(frmse), length(targets));
+    end
+    
+    for i = 1 : length(frmse)
+            
+        total_frmse{i, numHI} = frmse{i};
+        total_movMfrmse{i, numHI} = movmean(frmse{i}, 50);
+    
+        if plotNotSave
+            figure(i);
+            subplot(length(targets),1,numHI);
+            hold on;
+            plot(total_frmse{i, numHI});
+            plot(total_movMfrmse{i, numHI})
+            hold off;
+            title(['Sensor Target: ', num2str(targetSensor)]);
+            xlabel('Evaluation');
+            ylabel('FRMSE');
+            xlim([0, max(1800, length(total_frmse{i, numHI}))]);
+            ylim([0, 0.7])
+            grid on;
+        end
+    end
+    
+end
+
+if not(plotNotSave)
+        folderName = '..\dataNew\HealthIndexes\DATASET__PLACEHOLDER';
+        if ~exist(folderName, 'dir')
+            mkdir(folderName);
+        end
+        
+        % Generate the file name
+        targetStr = num2str(targets);
+        iteration = 0;
+        fileName = fullfile(folderName, sprintf('HI_targets%s_%02d.mat', targetStr, iteration));
+        
+        % Increment iteration if file already exists
+        while exist(fileName, 'file')
+            iteration = iteration + 1;
+            fileName = fullfile(folderName, sprintf('HI_targets%s_%02d.mat', targetStr, iteration));
+        end
+        
+        % Save the health index
+        save(fileName, 'total_frmse');
+end

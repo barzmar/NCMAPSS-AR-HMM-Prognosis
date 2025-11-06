@@ -22,10 +22,10 @@ BVectors = double.empty;
 for i = 1 : length(ppCruiseData(unit).flights)
     for c = 1 : length(ppCruiseData(unit).flights(i).cruises)
         % signal = iddata(ppCruiseData(unit).flights(i).cruises(c).DDValue(sensor_index, :)', [], 1);
-        output = [ppCruiseData(unit).flights(i).cruises(c).Value(sensor_index, 2:end)'];
+        output = [ppCruiseData(unit).flights(i).cruises(c).Value(sensor_index, 1:end)'];
         % mach_filtered = lowpass(ppCruiseData(unit).flights(i).cruises(c).Dad(6, :), 0.05, 1);  % Choose a reasonable cutoff
         
-        input = [ppCruiseData(unit).flights(i).cruises(c).d(7, :)'];
+        % input = [ppCruiseData(unit).flights(i).cruises(c).d(7, :)'];
         signal = iddata(output, input, 1);
 
         % ESTIMATION
@@ -49,7 +49,7 @@ plot(1:1:total_counter, AVectors(:,3))
 plot(1:1:total_counter, AVectors(:,4))
 
 % Create folder name based on current date and sensor index
-folderName = fullfile('..', 'figures', sprintf('Estimation%d%d%d_parameters%d_OutValueInd', ...
+folderName = fullfile('..', 'figures', sprintf('Estimation%d%d%d_parameters%d_OutValueInNone', ...
     day(datetime('now')), month(datetime('now')), year(datetime('now')), p));
 if ~exist(folderName, 'dir')
     mkdir(folderName);
